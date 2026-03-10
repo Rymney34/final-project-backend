@@ -1,6 +1,6 @@
-const geminiService = require('../services/aiService.js');
+import geminiService from '../services/aiService.js';
 
-const generateResponse = async (req, res) => {
+export const generateResponse = async (req, res) => {
     try {
         const {prompt} = req.body
 
@@ -31,7 +31,7 @@ const generateResponse = async (req, res) => {
 }
 
 
-const generateChat= async (req, res) => {
+export const generateChat= async (req, res) => {
     try {
         const { prompt, history} = req.body
 
@@ -61,8 +61,3 @@ const generateChat= async (req, res) => {
     }
 }
 
-
-module.exports = {
-    generateResponse,
-    generateChat
-};

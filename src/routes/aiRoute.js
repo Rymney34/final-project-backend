@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { generateResponse, generateChat } = require('../controller/aiController');
+import { generateResponse, generateChat } from '../controller/aiController.js';
 
 
 // Get all users
@@ -12,4 +12,4 @@ router.post('/getAiResponse', generateResponse)
 router.post('/getChat', generateChat )
 
 
-module.exports = router;
+export default router;

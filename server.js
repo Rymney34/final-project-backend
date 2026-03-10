@@ -1,10 +1,12 @@
-const express = require('express');
-const dotenv = require('dotenv');
+import express from 'express';
+import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env' });
-const cors = require("cors");
 
-const AiRoute = require("./src/routes/aiRoute");
+import cors from "cors";
+
+import AiRoute from "./src/routes/aiRoute.js";
+import MuseumRoute from "./src/routes/museumRoute.js";
+import db from './src/config/dbConnect.js'; 
 // const cookieParser = require('cookie-parser');
 // const mongoSanitize = require("express-mongo-sanitize");
 // const path = require('path');
@@ -18,8 +20,19 @@ const AiRoute = require("./src/routes/aiRoute");
 //     await db.connect(process.env.ATLAS_URI);
 // })();
 
+dotenv.config();
+
 const PORT = process.env.PORT || 3001
 const app = express()
+
+;(async () => {
+    try{
+        console.log("gazoz")
+        await db(process.env.ATLAS_URI);
+    }catch (error){
+        console.error("db erorr", error)
+    }
+})();
 // uploadImage()
 // connectDB()
 
@@ -34,6 +47,7 @@ app.get("/api/test", (req, res) => {
 });
 
 app.use("/api", AiRoute);
+app.use("/api", MuseumRoute);
 
 
 

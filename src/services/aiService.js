@@ -1,9 +1,13 @@
-const dotenv = require('dotenv');
-dotenv.config({ path: '../../.env' });
-const { GoogleGenAI } = require("@google/genai");
-const fs = require('fs');
+import dotenv from 'dotenv';
+import { GoogleGenAI } from "@google/genai";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const path = require('path');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -24,7 +28,7 @@ const adventOfCodeInput = readFile(path.join(__dirname, 'inst.txt'));
 // console.log(adventOfCodeInput)
 
 //calling Gemini AI API and passing props fro client 
-const generateResponseAi = async (userPrompt) => {
+export const generateResponseAi = async (userPrompt) => {
     // The client gets the API key from the environment variable `GEMINI_API_KEY`.
     // const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
 
@@ -87,7 +91,6 @@ const generateChat = async (userPrompt, incHistory = []) => {
 }
 
 
+export default generateChat
 
-
-module.exports = {generateResponseAi, generateChat}
 

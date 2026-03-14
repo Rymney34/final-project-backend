@@ -4,7 +4,7 @@ import multer from "multer";
 import { S3Client, PutObjectCommand, LocationType } from "@aws-sdk/client-s3";
 // import mongoose from "mongoose";
 import lock from "../config/lock.js";
-
+import 'dotenv/config';
 
 const s3 = new S3Client({
     region: process.env.S3_BUCKET_REGION,
@@ -16,16 +16,18 @@ const s3 = new S3Client({
 
 // fucntion that acctually upload to s3 AWS
 export const putObject = async (file, fileName) => {
+    console.log("Gazoz")
     try {
         const params = {
             Bucket: "museums-welsh-heritage-bucket",
             Key: `museum-content/${fileName}`,
             Body: file.buffer,
-            ContentType: "image/jpg,jpeg,png,mp4,heic",
+            ContentType: "image/jpg,jpeg,png",
         };
+        console.log(params.Key)
 
-        const command = new PutObjectCommand(params);
-        const data = await this.s3.send(command); 
+        const command = new PutObjectCommand(params)
+        const data = await s3.send(command); 
 
         if (data.$metadata.httpStatusCode !== 200) {
             return;
@@ -38,12 +40,14 @@ export const putObject = async (file, fileName) => {
     }
 };
 
+
 // actual controller an important function for uploaing images to AWS
 export const setMuseumPic = async (req, res) => {
+    console.log("Gazoz1")
     try {
-        const file = req.file;
+        const file = (req.files?.firstPageImage?.[0] || req.files?.slideImage?.[0]);
         const filename = `image-${Date.now()}-${file.originalname}`;
-        const { url, key } = await this.putObject(file, filename); // Call as method
+        const { url, key } = await putObject(file, filename); // Call as method
 
         if (!url || !key) {
             return res.status(400).json({
@@ -59,12 +63,12 @@ export const setMuseumPic = async (req, res) => {
 };
 
 
-// actual controller an important function for uploaing images to AWS
+// actual controller an important function for uploaing videos to AWS
 export const setMuseumVideo = async (req, res) => {
     try {
         const file = req.file;
         const filename = `video-${Date.now()}-${file.originalname}`;
-        const { url, key } = await this.putObject(file, filename); // Call as method
+        const { url, key } = await putObject(file, filename); // Call as method
 
         if (!url || !key) {
             return res.status(400).json({
@@ -80,6 +84,7 @@ export const setMuseumVideo = async (req, res) => {
 };
 
 export const createMuseum = async (req, res) => {
+    console.log("gazosdfsdfsdfsdz")
     const lockKey = 'allMuseumcreation'; // unique for reference 
     try {
         // getting user from frontend 
@@ -87,13 +92,14 @@ export const createMuseum = async (req, res) => {
             firstPageImage,
             museumTitle,
             openingTime,
-            cotactInfo,
+            contactInfo,
             accessiblityInfo,
             location,
             slider,
             video,
             virtualTours,
             map,
+            map3d,
         } = req.body;
         // check that all not null or undefined that there is value
         if (!museumTitle || !firstPageImage) { return res.status(400).json({ message: "Missing required fields" }); }
@@ -102,17 +108,18 @@ export const createMuseum = async (req, res) => {
         const newMuseum= await lock.acquire(lockKey, async () => {
             // creating actual Museum
             const addMuseum = new Museums({
-                user: req.user.sub,
+                // user: req.user.sub,
                 firstPageImage,
                 museumTitle,
                 openingTime,
-                cotactInfo,
+                contactInfo,
                 accessiblityInfo,
                 location,
                 slider,
                 video,
                 virtualTours,
                 map,
+                map3d,
             });
             // saving booking into db
             await addMuseum.save(); // throws an error if document was update by another process
@@ -147,6 +154,9 @@ export const createMuseum = async (req, res) => {
 }
 
 const storage = multer.memoryStorage();
-export const uploadMiddleware = multer({ storage }).single("museumImage");
+export const uploadMiddleware = multer({ storage }).fields([
+    { name: "firstPageImage", maxCount: 1},
+    { name: "slideImage"}
+]);
 
 

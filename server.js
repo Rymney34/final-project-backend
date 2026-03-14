@@ -1,9 +1,7 @@
-import express from 'express';
 import dotenv from 'dotenv';
-
-
+dotenv.config();
+import express from 'express';
 import cors from "cors";
-
 import AiRoute from "./src/routes/aiRoute.js";
 import MuseumRoute from "./src/routes/museumRoute.js";
 import db from './src/config/dbConnect.js'; 
@@ -20,7 +18,7 @@ import db from './src/config/dbConnect.js';
 //     await db.connect(process.env.ATLAS_URI);
 // })();
 
-dotenv.config();
+
 
 const PORT = process.env.PORT || 3001
 const app = express()
@@ -46,15 +44,15 @@ app.get("/api/test", (req, res) => {
     res.json({ message: "Backend OK ✅" });
 });
 
-app.use("/api", AiRoute);
-app.use("/api", MuseumRoute);
-
-
 
 app.listen(PORT, () => {
     console.log('Server starting on port', PORT)
 
 })
+
+app.use("/api", AiRoute);
+app.use("/api", MuseumRoute);
+
 
 
 

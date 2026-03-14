@@ -11,14 +11,12 @@ export const generateResponse = async (req, res) => {
             })
         }
 
-        const aiRes = await geminiService.generateResponseAi(prompt);
-
+        const aiRes = await geminiService(prompt);
 
         return res.status(200).json({
             success: true,
             data: aiRes
         })
-
     }
     catch(error){
         console.error("Error in Aicontoller:", error.message);
@@ -29,7 +27,6 @@ export const generateResponse = async (req, res) => {
         })
     }
 }
-
 
 export const generateChat= async (req, res) => {
     try {
@@ -42,8 +39,7 @@ export const generateChat= async (req, res) => {
             })
         }
 
-        const aiRes = await geminiService.generateChat(prompt,history);
-
+        const aiRes = await geminiService(prompt,history);
 
         return res.status(200).json({
             success: true,

@@ -1,10 +1,11 @@
 // import jwtTokenProvider from "../security/auth/jwtTokenProvider.js";
-import Museums from "../models/museum.js";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import multer from "multer";
-import { S3Client, PutObjectCommand, LocationType } from "@aws-sdk/client-s3";
+import Museums from "../models/museum.js";
 // import mongoose from "mongoose";
-import lock from "../config/lock.js";
 import 'dotenv/config';
+import lock from "../config/lock.js";
+import museum from "../models/museum.js"
 
 const s3 = new S3Client({
     region: process.env.S3_BUCKET_REGION,
@@ -150,6 +151,33 @@ export const createMuseum = async (req, res) => {
             error: error.message
         })
         res.status(400).json({ error: error.message });
+    }
+}
+
+export const getMuseum = async (req,res) => {
+    console.log("getMusumsz")
+    try {
+        const projection =[
+            {
+                $match: {}
+            },
+            {
+                $project: {
+                    _id: 0,
+                    museumTitle:1,
+                    location: 1,
+                    firstPageImage: 1
+                }
+            }
+        ];
+
+        const result = await museum.aggregate(projection);
+
+        return res.status(200).json(result)
+    }
+    catch (error){
+        console.log(error)
+        throw error
     }
 }
 

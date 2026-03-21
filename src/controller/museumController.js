@@ -6,6 +6,7 @@ import Museums from "../models/museum.js";
 import 'dotenv/config';
 import lock from "../config/lock.js";
 import museum from "../models/museum.js"
+import mongoose from "mongoose";
 
 const s3 = new S3Client({
     region: process.env.S3_BUCKET_REGION,
@@ -154,17 +155,17 @@ export const createMuseum = async (req, res) => {
     }
 }
 
-export const getMuseum = async (req,res) => {
+export const getMuseum = async (req, res) => {
     console.log("getMusumsz")
     try {
-        const projection =[
+        const projection = [
             {
                 $match: {}
             },
             {
                 $project: {
-                    _id: 0,
-                    museumTitle:1,
+                    _id: 1,
+                    museumTitle: 1,
                     location: 1,
                     firstPageImage: 1
                 }
@@ -173,10 +174,44 @@ export const getMuseum = async (req,res) => {
 
         const result = await museum.aggregate(projection);
 
+        if(!result){
+            return res.status(404).json({
+                success:false,
+                message: "No museums are found in the DB",
+            })
+        }
+
         return res.status(200).json(result)
     }
-    catch (error){
+    catch (error) {
         console.log(error)
+        throw error
+    }
+}
+
+export const getEachMuseum = async (req, res) => {
+    console.log("getEachMusumsz")
+
+    try {
+        // getting id from frontend 
+        const { id } = req.params;
+        //validtion in case of the invalid ID - just in case 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid Museum ID" })
+        }
+        //find musumse by ID
+        const result = await museum.findById(id);
+
+
+        if (!result) {
+            return res.status(404).json({ message: "Museum Not found" })
+        }
+
+        return res.status(200).json(result)
+    }
+    catch (error) {
+        console.log("Error finding musueum:", error);
+        return res.status(500).json({ message: "invalid Id, server error", error: error.message})
         throw error
     }
 }

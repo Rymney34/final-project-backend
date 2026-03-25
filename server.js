@@ -4,19 +4,9 @@ import express from 'express';
 import cors from "cors";
 import AiRoute from "./src/routes/aiRoute.js";
 import MuseumRoute from "./src/routes/museumRoute.js";
+import UserRoute from "./src/routes/userRoute.js";
 import db from './src/config/dbConnect.js'; 
-// const cookieParser = require('cookie-parser');
-// const mongoSanitize = require("express-mongo-sanitize");
-// const path = require('path');
-
-// const connectDB = require('./config/dbConnect');
-// Connect to MongoDB Databases
-// const db = require('./config/dbConnect');
-// const uploadImage = require("./imageUploader/imageUploader.js");
-
-// (async () => {
-//     await db.connect(process.env.ATLAS_URI);
-// })();
+import cookieParser from 'cookie-parser';
 
 
 
@@ -25,7 +15,6 @@ const app = express()
 
 ;(async () => {
     try{
-        console.log("gazoz")
         await db(process.env.ATLAS_URI);
     }catch (error){
         console.error("db erorr", error)
@@ -37,9 +26,15 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 //calling cors
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 //calling cookies func
-// app.use(cookieParser())
+app.use(cookieParser());
+
+
+
 app.get("/api/test", (req, res) => {
     res.json({ message: "Backend OK ✅" });
 });
@@ -52,6 +47,7 @@ app.listen(PORT, () => {
 
 app.use("/api", AiRoute);
 app.use("/api", MuseumRoute);
+app.use("/api", UserRoute);
 
 
 

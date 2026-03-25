@@ -156,8 +156,9 @@ export const createMuseum = async (req, res) => {
 }
 
 export const getMuseum = async (req, res) => {
-    console.log("getMusumsz")
+
     try {
+        // query to bakedn
         const projection = [
             {
                 $match: {}
@@ -171,9 +172,9 @@ export const getMuseum = async (req, res) => {
                 }
             }
         ];
-
+        //actual call to backend
         const result = await museum.aggregate(projection);
-
+        //404 error 
         if(!result){
             return res.status(404).json({
                 success:false,
@@ -190,7 +191,7 @@ export const getMuseum = async (req, res) => {
 }
 
 export const getEachMuseum = async (req, res) => {
-    console.log("getEachMusumsz")
+ 
 
     try {
         // getting id from frontend 

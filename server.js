@@ -5,6 +5,8 @@ import cors from "cors";
 import AiRoute from "./src/routes/aiRoute.js";
 import MuseumRoute from "./src/routes/museumRoute.js";
 import UserRoute from "./src/routes/userRoute.js";
+import LibraryRoute from "./src/routes/libraryRoute.js";
+import EventRoute from "./src/routes/eventsRoute.js";
 import db from './src/config/dbConnect.js'; 
 import cookieParser from 'cookie-parser';
 
@@ -48,7 +50,8 @@ app.listen(PORT, () => {
 app.use("/api", AiRoute);
 app.use("/api", MuseumRoute);
 app.use("/api", UserRoute);
-
+app.use("/api", LibraryRoute);
+app.use("/api", EventRoute);
 
 
 

@@ -27,15 +27,37 @@ const adventOfCodeInput = readFile(path.join(__dirname, 'inst.txt'));
 
 // console.log(adventOfCodeInput)
 
-//calling Gemini AI API and passing props fro client 
-export const generateResponseAi = async (userPrompt) => {
+//calling Gemini AI API and passing props from client 
+export const generateResponseAi = async (userPrompt, files=[]) => {
     // The client gets the API key from the environment variable `GEMINI_API_KEY`.
     // const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
-
+    console.log('Insight');
     try{
+        const parts = [];
+
+        if(userPrompt){
+            parts.push({text: userPrompt});
+        }
+
+        for (const file of files){
+            parts.push({
+                inlineData: {
+                    mimeType: file.mimeType,
+                    data: file.base64
+                }
+            })
+        }
+
+        console.log("this is parts", parts)
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-lite",
-            contents: userPrompt,
+            contents:[
+                {
+                    role: "user",
+                    parts: parts
+                }
+            ],
+            //giving instructions from txt file
             config: {
                 systemInstruction: `use this information, keep it mind or reference 
                 where applicable to response to each prompt  ${adventOfCodeInput}`,
@@ -53,15 +75,30 @@ export const generateResponseAi = async (userPrompt) => {
 }
 
 //calling Gemini AI API and passing props from client to start chat
-const generateChat = async (userPrompt, incHistory = []) => {
+const generateChat = async (userPrompt, files = [], incHistory = []) => {
     // The client gets the API key from the environment variable `GEMINI_API_KEY`.
-   
+    console.log('generate chat');
     const generationConfig = {
         temperature: 0.3,
         topK: 1,
         topP: 1,
         maxOutputTokens: 300,
     };
+
+    const parts = [];
+    //just text no file
+    if (userPrompt) {
+        parts.push({ text: userPrompt });
+    }
+    //file pushing into array 
+    for (const file of files) {
+        parts.push({
+            inlineData: {
+                mimeType: file.mimeType,
+                data: file.base64
+            }
+        })
+    }
 
     try {
         const chat = await ai.chats.create({
@@ -75,9 +112,8 @@ const generateChat = async (userPrompt, incHistory = []) => {
 
         });
 
-        const result = await chat.sendMessage({message: userPrompt});
+        const result = await chat.sendMessage({message: parts});
         // const response = result.response;
-        console.log(result.text)
         return result.text;
       
 

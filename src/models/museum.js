@@ -33,34 +33,25 @@ const museumScheme = new mongoose.Schema({
         }
         }
     ],
-    video: { type: String, required: true },
+    video: { type: String},
     virtualTours: [
         {
             tour: {
                 type: String,
-                required: true,
             },
             
         }
     ],
     map: { type: String, required: true },
-   
 },
     {
         versionKey: false,
         collection: 'museums'
     });
-
 museumScheme.index(
     { museumTitle: 1 },
     { unique: true }
 )
-// bookingSchema.index({ 
-//   serviceTitle: "text",
-//   secondName: "text",
-//   postCode: "text",
-//   address: "text", 
-// });
 
 const museumsModel=
     mongoose.models.museums ||

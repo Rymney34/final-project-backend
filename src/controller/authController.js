@@ -18,7 +18,7 @@ import { generateAccessToken, generateRefreshToken, authenticateToken, verifyRef
     // refresh token func by cheking token and that token is valid
     export const refreshFunc = async (req, res) => {
         try {
-            console.log("cookies:", req.cookies);
+            // console.log("cookies:", req.cookies);
             const token = req.cookies.refreshToken;
         if (!token) return res.sendStatus(401);
 
@@ -36,6 +36,8 @@ import { generateAccessToken, generateRefreshToken, authenticateToken, verifyRef
     // logout deleteing cookie refresh token on the server side 
     export const logout = async (req, res) => {
         try {
+        console.log("logout")
+
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: false,

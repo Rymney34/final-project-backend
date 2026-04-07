@@ -18,7 +18,6 @@ const s3 = new S3Client({
 
 // fucntion that acctually upload to s3 AWS
 export const putObject = async (file, fileName) => {
-    console.log("Gazoz")
     try {
         const params = {
             Bucket: "museums-welsh-heritage-bucket",
@@ -45,7 +44,6 @@ export const putObject = async (file, fileName) => {
 
 // actual controller an important function for uploaing images to AWS
 export const setMuseumPic = async (req, res) => {
-    console.log("Gazoz1")
     try {
         const file = (req.files?.firstPageImage?.[0] || req.files?.slideImage?.[0]);
         const filename = `image-${Date.now()}-${file.originalname}`;
@@ -86,7 +84,6 @@ export const setMuseumVideo = async (req, res) => {
 };
 
 export const createMuseum = async (req, res) => {
-    console.log("gazosdfsdfsdfsdz")
     const lockKey = 'allMuseumcreation'; // unique for reference 
     try {
         // getting user from frontend 

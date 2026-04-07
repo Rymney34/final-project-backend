@@ -54,6 +54,8 @@ import bcrypt from "bcryptjs";
         }
     };
 
+    
+
     export const loginUser = async (req, res) => {
         try {
 
@@ -99,6 +101,30 @@ import bcrypt from "bcryptjs";
             res.status(500).json({ error: err.message });
         }
     };
+
+    export const getUser = async (req, res) => {
+
+        try {
+
+            const userId = req.user.sub;
+            //exclude password
+            const user = await User.findOne({ _id: userId }).select('-password');
+            
+            //check if user is empty 
+            if (!user) {
+                return res.status(400).json({ error: 'no user' });
+            }
+
+            
+            res.json(user);
+        } catch (err) {
+            console.error("geting user error:", err);
+            res.status(500).json({ error: err.message });
+        }
+};
+
+
+
 
     export const isAdminUser = async (req, res) => {
         try {

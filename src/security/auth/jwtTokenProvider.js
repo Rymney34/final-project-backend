@@ -40,7 +40,7 @@ import express from 'express';
     export const verifyRefreshToken = (token) => {
         try {
             const userPayload = jwt.verify(token, REFRESH_Token);
-            console.log(userPayload)
+           
             return userPayload; 
         } catch (err) {
             // Token is invalid or expired
@@ -49,21 +49,39 @@ import express from 'express';
         }
     }
 
-    // verification of the access token 
+    export const verifyDecodeToken = (req, res, next) =>{
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1];
 
+            if (!token) return res.status(401).json({ message: 'No token Provided' })
+            //verify token and return user based on the token 
+            jwt.verify(token, JWT_Token, async (err, decoded) => {
+                if (err) return res.status(403).json({ message: "Invalid or expired token" });
+                req.user = decoded
+                
+                next()
+            })
+        } catch (err) {
+            // Token is invalid or expired
+            console.error("Refressh Token Verification Error", err.Message)
+            return null;
+        }
+        
+    }
+
+    // verification of the access token 
     export const authenticateToken = (req, res, next) => {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1]; 
 
-        console.log("acutal "+token)
+        // console.log("acutal "+token)
         if (!token ) {
             return res.status(401).json({data:[], message: 'Token missing' });
         }
   // verification if the token is the proper token
         jwt.verify(token, JWT_Token, (err, user) => {
-            // console.log('fsdfsdf FF '+token)
             if (err) {
-               
                 return res.status(403).json({ data:[],message: 'Invalid or expired token' });
             }
 

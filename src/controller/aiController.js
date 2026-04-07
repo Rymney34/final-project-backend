@@ -30,7 +30,9 @@ export const generateResponse = async (req, res) => {
 
 export const generateChat= async (req, res) => {
     try {
-        const { prompt, history} = req.body
+        const { prompt,files, history } = req.body
+
+        console.log("eto file",files)
 
         if (!prompt) {
             return res.status(400).json({
@@ -39,7 +41,7 @@ export const generateChat= async (req, res) => {
             })
         }
 
-        const aiRes = await geminiService(prompt,history);
+        const aiRes = await geminiService(prompt,files,history);
 
         return res.status(200).json({
             success: true,

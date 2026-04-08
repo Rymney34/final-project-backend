@@ -57,6 +57,7 @@ export const generateResponseAi = async (userPrompt, files=[]) => {
                     parts: parts
                 }
             ],
+            tools:[{googleMaps: {}}],
             //giving instructions from txt file
             config: {
                 systemInstruction: `use this information, keep it mind or reference 

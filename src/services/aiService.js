@@ -74,11 +74,48 @@ export const generateResponseAi = async (userPrompt, files=[]) => {
         throw new Error("Failed to communicate with AI");
     }
 }
+export const summariseHistory = async (history1) => {
+    try {
+
+        const prompt = `
+            TASK: Extract user traits from chat history.
+            FORMAT: Output ONLY a short list of facts. No conversation.
+
+            EXAMPLES:
+            History: "I use a wheelchair. Where is the lift?"
+            Output: User has physical disability/uses wheelchair.
+
+            History: "I prefer quiet spaces, it's too loud here."
+            Output: User prefers low-sensory/quiet environments.
+
+            History: "${history1}"
+            Output:
+        `;
+
+        const result = await ai.models.generateContent(
+            {
+                model: "gemini-2.5-flash-lite",
+                generationConfig: {
+                    temperature: 0.1
+                },
+                contents: prompt
+            }
+            );
+        const summary = result.text;
+
+        // console.log("This summary:", summary);
+
+        return summary;
+
+    } catch (error) {
+        console.error("Summarise History error:", error);
+        throw error;
+    }
+};
 
 //calling Gemini AI API and passing props from client to start chat
-const generateChat = async (userPrompt, files = [], incHistory = []) => {
-    // The client gets the API key from the environment variable `GEMINI_API_KEY`.
-    console.log('generate chat');
+const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary=[] ) => {
+  
     const generationConfig = {
         temperature: 0.3,
         topK: 1,
@@ -107,7 +144,9 @@ const generateChat = async (userPrompt, files = [], incHistory = []) => {
             model: "gemini-2.5-flash-lite",
             config: {
                 systemInstruction: `use this information, keep it mind or reference 
-                where applicable to response to each prompt  ${adventOfCodeInput}`,
+                where applicable to response to each prompt  ${adventOfCodeInput}
+                GENERAL INFO ABOUT THIS USER - User Profile ${chatSummary}
+                `,
             },
             history : incHistory
 
@@ -116,10 +155,6 @@ const generateChat = async (userPrompt, files = [], incHistory = []) => {
         const result = await chat.sendMessage({message: parts});
         // const response = result.response;
         return result.text;
-      
-
-        // console.log(response1.text);
-        // return response1.text
     }
     catch (error) {
         console.error("Gemini Service Error:", error);
@@ -129,5 +164,7 @@ const generateChat = async (userPrompt, files = [], incHistory = []) => {
 
 
 export default generateChat
+
+
 
 

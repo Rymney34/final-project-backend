@@ -7,8 +7,11 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isAdmin: { type: Boolean },
-
-},
+    chatSummary: {
+        type: [String],
+        default: ["This is a new user. No previous information is known."]
+    }
+    },
     {
         versionKey: false,
         collection: 'users'

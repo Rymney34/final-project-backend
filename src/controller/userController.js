@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import { generateAccessToken, generateRefreshToken, authenticateToken, verifyRefreshToken } from '../security/auth/jwtTokenProvider.js';
+import {summariseHistory} from "../services/aiService.js"
 import sanitize from 'mongo-sanitize';
 import bcrypt from "bcryptjs";
 
@@ -120,6 +121,53 @@ import bcrypt from "bcryptjs";
         } catch (err) {
             console.error("geting user error:", err);
             res.status(500).json({ error: err.message });
+        }
+    };
+
+    export const putChatHistory = async (req, res, next) => {
+
+        try {
+            console.log("body ", req.body)
+
+            const { userId, history } = req.body;
+            // const {history } = req.body;
+            console.log(userId, "userID")
+            console.log(history, "user history")
+
+            if (!history) {
+                return res.status(400).json({ error: "Missing required fields" });
+            }
+
+            const userOnlyHistoryArray = history
+                .filter(item => item.role === 'user')
+                .map(item => item.parts[0].text)
+
+            const userOnlyHistory = userOnlyHistoryArray.join(" ")
+
+            console.log(userOnlyHistory, "user only  history")
+
+            const summary = await summariseHistory(userOnlyHistory);
+
+            console.log("Final Summary to save", summary)
+                // const user = await User.findById(userId);
+            
+            if (userOnlyHistoryArray.length >= 2 && userId){
+                
+                console.log("Inside")
+                const updatedUser = await User.findByIdAndUpdate(
+                    userId,
+                    {$addToSet: {chatSummary: summary}},
+                    {new: true}
+                )
+                req.userSummary = updatedUser.chatSummary.join(", ");
+            }
+            next()
+           
+
+        } catch (err) {
+            console.error("Error:", err);
+            res.status(400).json({ error: err.message });
+            next()
         }
 };
 

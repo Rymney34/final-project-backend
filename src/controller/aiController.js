@@ -28,11 +28,12 @@ export const generateResponse = async (req, res) => {
     }
 }
 
-export const generateChat= async (req, res) => {
+export const generateChat= async (req, res,next) => {
     try {
-        const { prompt,files, history } = req.body
+        const { prompt, files, history } = req.body
 
-        console.log("eto file",files)
+        const userPersona = req.userSummary
+   
 
         if (!prompt) {
             return res.status(400).json({
@@ -41,13 +42,13 @@ export const generateChat= async (req, res) => {
             })
         }
 
-        const aiRes = await geminiService(prompt,files,history);
-
+        const aiRes = await geminiService(prompt,files,history, userPersona);
+        next()
         return res.status(200).json({
             success: true,
             data: aiRes,
         })
-
+       
     }
     catch (error) {
         console.error("Error in Aicontoller:", error.message);

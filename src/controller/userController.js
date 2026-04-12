@@ -1,23 +1,22 @@
-import User from "../models/user.js";
-import { generateAccessToken, generateRefreshToken, authenticateToken, verifyRefreshToken } from '../security/auth/jwtTokenProvider.js';
-import {summariseHistory} from "../services/aiService.js"
-import sanitize from 'mongo-sanitize';
 import bcrypt from "bcryptjs";
-
-
-
+import sanitize from 'mongo-sanitize';
+import User from "../models/user.js";
+import { generateAccessToken, generateRefreshToken } from '../security/auth/jwtTokenProvider.js';
+import { summariseHistory } from "../services/aiService.js";
+//creating user 
     export const createUser = async (req, res) => {
         try {
+            //cleaning received data so is protecting db and sever 
             const firstName = sanitize(req.body.firstName);
             const lastName = sanitize(req.body.lastName);
             const email = sanitize(req.body.email);
             const password = sanitize(req.body.password);
             const isAdmin = req.body.isAdmin;
-
+            //in case empty data recieved
             if (!firstName || !email || !password || !lastName) {
                 return res.status(400).json({ error: "Missing required fields" });
             }
-
+            
             if (
                 typeof firstName !== "string" ||
                 typeof email !== "string" ||
@@ -26,14 +25,14 @@ import bcrypt from "bcryptjs";
             ) {
                 return res.status(400).json({ error: "Invalid input type" });
             }
-
+            //query to db to check if user exist 
             const existingUser = await User.findOne({email})
             if(existingUser){
                 return res.status(400).json({message: "Email already Registered"})
             }
-
+            //decrypt password
             const hashPass = await bcrypt.hash(password, 10);
-
+            //creating, passing actual data to db
             const newUser = new User({
                 firstName,
                 lastName,
@@ -41,9 +40,9 @@ import bcrypt from "bcryptjs";
                 password: hashPass,
                 isAdmin,
             });
-
+            //saving it to db
             await newUser.save();
-
+            //returning it to db
             res.status(201).json({
                 firstName: newUser.firstName,
                 email: newUser.email,
@@ -54,38 +53,36 @@ import bcrypt from "bcryptjs";
             res.status(400).json({ error: err.message });
         }
     };
-
-    
-
+    //login user 
     export const loginUser = async (req, res) => {
         try {
-
+            //protection 
             const email = sanitize(req.body.email)
             const password = sanitize(req.body.password)
-
+            //find user based on input by user
             const user = await User.findOne({ email });
-
+            //in case something is wrong with user details 
             if (!user) {
                 return res.status(400).json({ error: 'Invalid email or password' });
             }
-
+            //try to match data with sent data
             const isMatch = await bcrypt.compare(password, user.password);
-
+            //validation
             if (!isMatch) {
                 return res.status(400).json({ error: 'Invalid email or password' });
             }
-
+            //tokens 
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
 
             console.log(refreshToken)
-
+            //put data into cookies 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'lax',
             });
-
+            //returning to database
             res.json({
                 message: 'Login successful',
                 accessToken,
@@ -102,7 +99,7 @@ import bcrypt from "bcryptjs";
             res.status(500).json({ error: err.message });
         }
     };
-
+    //getting user and its details
     export const getUser = async (req, res) => {
 
         try {
@@ -123,7 +120,7 @@ import bcrypt from "bcryptjs";
             res.status(500).json({ error: err.message });
         }
     };
-
+    // recive and put chat history to db 
     export const putChatHistory = async (req, res, next) => {
 
         try {
@@ -137,23 +134,20 @@ import bcrypt from "bcryptjs";
             if (!history) {
                 return res.status(400).json({ error: "Missing required fields" });
             }
-
+            //putting srting 'users' data in to Array 
             const userOnlyHistoryArray = history
                 .filter(item => item.role === 'user')
                 .map(item => item.parts[0].text)
-
+            //then get it from array and join each node together in one single line
             const userOnlyHistory = userOnlyHistoryArray.join(" ")
 
             console.log(userOnlyHistory, "user only  history")
 
+            //calling function for summarizing 
             const summary = await summariseHistory(userOnlyHistory);
-
-            console.log("Final Summary to save", summary)
-                // const user = await User.findById(userId);
-            
+            // if users id is there and userHistory is leng more or equal to 2 it will save data to db
             if (userOnlyHistoryArray.length >= 2 && userId){
-                
-                console.log("Inside")
+                //query to DB
                 const updatedUser = await User.findByIdAndUpdate(
                     userId,
                     {$addToSet: {chatSummary: summary}},
@@ -161,18 +155,15 @@ import bcrypt from "bcryptjs";
                 )
                 req.userSummary = updatedUser.chatSummary.join(", ");
             }
+            //moving to the next function
             next()
-           
 
         } catch (err) {
             console.error("Error:", err);
             res.status(400).json({ error: err.message });
             next()
         }
-};
-
-
-
+    };
 
     export const isAdminUser = async (req, res) => {
         try {

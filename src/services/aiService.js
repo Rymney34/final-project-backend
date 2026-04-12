@@ -74,9 +74,11 @@ export const generateResponseAi = async (userPrompt, files=[]) => {
         throw new Error("Failed to communicate with AI");
     }
 }
+
+//method to summarise users chat and what user said
 export const summariseHistory = async (history1) => {
     try {
-
+        //actual prompt to AI to summaries received data
         const prompt = `
             TASK: Extract user traits from chat history.
             FORMAT: Output ONLY a short list of facts. No conversation.
@@ -91,7 +93,7 @@ export const summariseHistory = async (history1) => {
             History: "${history1}"
             Output:
         `;
-
+        //SENDING prompt to ai 
         const result = await ai.models.generateContent(
             {
                 model: "gemini-2.5-flash-lite",
@@ -103,8 +105,7 @@ export const summariseHistory = async (history1) => {
             );
         const summary = result.text;
 
-        // console.log("This summary:", summary);
-
+        //just return summary of the text written by user
         return summary;
 
     } catch (error) {
@@ -115,7 +116,7 @@ export const summariseHistory = async (history1) => {
 
 //calling Gemini AI API and passing props from client to start chat
 const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary=[] ) => {
-  
+    //config for ai to conroll it's usage and costs 
     const generationConfig = {
         temperature: 0.3,
         topK: 1,
@@ -139,21 +140,22 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
     }
 
     try {
+        //calling AI model with intruction from txt file and passing dynamic history from db
         const chat = await ai.chats.create({
             generationConfig,
             model: "gemini-2.5-flash-lite",
             config: {
                 systemInstruction: `use this information, keep it mind or reference 
                 where applicable to response to each prompt  ${adventOfCodeInput}
-                GENERAL INFO ABOUT THIS USER - User Profile ${chatSummary}
+                GENERAL INFO ABOUT THIS USER - User Profile ${chatSummary || "Nothing"}
                 `,
             },
             history : incHistory
 
         });
-
+        //sending mesage with all instrucitons etc
         const result = await chat.sendMessage({message: parts});
-        // const response = result.response;
+        // returning AI response
         return result.text;
     }
     catch (error) {

@@ -3,7 +3,7 @@ import Event from "../models/event.js";
 export const getEvents= async (req, res) => {
 
     try {
-        // query to bakedn
+        // query to bakend
         const projection = [
             {
                 $match: {}

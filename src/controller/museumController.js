@@ -155,11 +155,17 @@ export const createMuseum = async (req, res) => {
 export const getMuseum = async (req, res) => {
 
     try {
+        //limit in amount of museum added to reduce load time and load on the server and db
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8;
+        const skip = (page-1) * limit;
         // query to bakedn
         const projection = [
             {
                 $match: {}
             },
+            {$skip: skip},
+            {$limit: limit},
             {
                 $project: {
                     _id: 1,
@@ -171,6 +177,7 @@ export const getMuseum = async (req, res) => {
         ];
         //actual call to backend
         const result = await museum.aggregate(projection);
+        const totalMuseums  = await museum.countDocuments();
         //404 error 
         if(!result){
             return res.status(404).json({
@@ -178,8 +185,10 @@ export const getMuseum = async (req, res) => {
                 message: "No museums are found in the DB",
             })
         }
-
-        return res.status(200).json(result)
+        return res.status(200).json({
+            result: result,
+            hasMore: skip + result.length < totalMuseums
+        });
     }
     catch (error) {
         console.log(error)
@@ -188,8 +197,6 @@ export const getMuseum = async (req, res) => {
 }
 
 export const getEachMuseum = async (req, res) => {
- 
-
     try {
         // getting id from frontend 
         const { id } = req.params;

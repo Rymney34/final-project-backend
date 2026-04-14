@@ -4,24 +4,24 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
-import Museum from "../../models/museum.js";
+import User from "../../models/user.js";
 import app from "../appTest.js";
 import db from './src/config/dbConnect.js';
 var mongodb = process.env.ATLAS_URI_TEST
 
 
-describe("Authentication User Integration DB", () => {
+describe("AI test", () => {
 
     beforeAll(async () => {
         // connect to DB before start 
         await db(mongodb);
-        await Museum.removeAllListeners({})
+        await User.removeAllListeners({})
 
     });
 
     afterEach(async () => {
         //after each test it deletes everthing from db
-        await Museum.deleteMany({});
+        await User.deleteMany({});
     });
 
     afterAll(async () => {
@@ -29,17 +29,43 @@ describe("Authentication User Integration DB", () => {
         await mongoose.connection.close();
     });
 
-    test("should Generate Chat", async () => {
+    test("should generate text Chat", async () => {
 
-        const promptToAI = "I am feeling good and calm today so can you recomend me which Museum should I visit? "
+        const chatPromptToAI = {
+            prompt:  "I am feeling good and calm today so can you recomend me which Museum should I visit? ",
+            files: [],
+            history: [],
+        }
 
         const res = await request(app)
-            .post("/api/createMuseum")
-            .send(newMuseum)
-            .expect(201);
+            .post("/api/getChat")
+            .send(chatPromptToAI)
+            .expect(200);
 
-        expect(res.body.data).toMatchObject(newMuseum);
-        expect(res.body.data.museumTitle).toBe("The Grand Gallery of Art");
+        console.log(res.body.data)
+        expect(typeof res.body.data).toBe("string");
         expect(res.body.success).toBe(true);
-    })
+    }, 12000) //give AI 12 seconds to respond
+
+    test("should generate text with history Chat", async () => {
+
+        const chatPromptToAI = {
+            prompt: "do I like fossils?",
+            files: [],
+            history: [
+                { role: "user", parts: [{ text: "Hi, museum red!"}]},
+                {role: "model", parts: [{text: "Hello! OK, How can I help?"}]}
+            ],
+            
+        }
+
+        const res = await request(app)
+            .post("/api/getChat")
+            .send(chatPromptToAI)
+            .expect(200);
+
+        console.log(res.body.data)
+        expect(typeof res.body.data).toBe("string");
+        expect(res.body.success).toBe(true);
+    }, 12000) //give AI 12 seconds to respond
 })

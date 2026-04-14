@@ -22,6 +22,10 @@ app.use(cors({
 // Routes
 app.use('/api', userRoute);
 app.use('/api', museumRoute);
+app.use((req, res, next) => {
+  req.userSummary = "The user is obsessed with dinosaurs and Jurasic fossils."
+  next()
+})
 app.use('/api', aiRoute);
 
 // Test route

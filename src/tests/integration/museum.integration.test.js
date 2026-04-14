@@ -10,7 +10,7 @@ import db from './src/config/dbConnect.js';
 var mongodb = process.env.ATLAS_URI_TEST
 
 
-describe("Authentication User Integration DB", () => {
+describe("museum Creation wiht DB", () => {
 
     beforeAll(async () => {
         // connect to DB before start 

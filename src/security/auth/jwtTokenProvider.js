@@ -3,7 +3,7 @@ import express from 'express';
 
 
     
-    const JWT_Token = process.env.ACCESS_TOKEN_SECRET;
+    const JWT_Token = process.env.ACCESS_TOKEN_SECRET || "super_secret_test_key_123";
     const ACCESS_Token_Expires = '10min';
     const REFRESH_Token = process.env.REFRESH_TOKEN;
     const REFRESH_Token_Expires = "1d"
@@ -84,7 +84,6 @@ import express from 'express';
             if (err) {
                 return res.status(403).json({ data:[],message: 'Invalid or expired token' });
             }
-
             req.user = user; 
             next();
         });

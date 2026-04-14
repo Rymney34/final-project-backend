@@ -13,9 +13,9 @@ import cookieParser from 'cookie-parser';
 
 
 const PORT = process.env.PORT || 3001
-const app = express()
+const app = express();
 
-;(async () => {
+(async () => {
     try{
         await db(process.env.ATLAS_URI);
     }catch (error){

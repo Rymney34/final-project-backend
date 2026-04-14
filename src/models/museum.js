@@ -3,11 +3,6 @@ import connect from "../config/dbConnect.js";
 
 // model for museum
 const museumScheme = new mongoose.Schema({
-    // user: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "user",
-    //     required: true,
-    // },
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
     firstPageImage: { type: String, required: true },
     museumTitle: { type: String, required: true },

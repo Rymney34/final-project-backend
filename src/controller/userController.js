@@ -83,7 +83,7 @@ import { summariseHistory } from "../services/aiService.js";
                 sameSite: 'lax',
             });
             //returning to database
-            res.json({
+            res.status(200).json({
                 message: 'Login successful',
                 accessToken,
                 user: {

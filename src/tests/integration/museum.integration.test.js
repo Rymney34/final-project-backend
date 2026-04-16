@@ -9,28 +9,23 @@ import app from "../appTest.js";
 import db from './src/config/dbConnect.js';
 var mongodb = process.env.ATLAS_URI_TEST
 
-
+// museum unit creation test
 describe("museum Creation wiht DB", () => {
-
     beforeAll(async () => {
         // connect to DB before start 
         await db(mongodb);
         await Museum.removeAllListeners({})
-
     });
-
     afterEach(async () => {
         //after each test it deletes everthing from db
         await Museum.deleteMany({});
     });
-
     afterAll(async () => {
         //after all test close connection
         await mongoose.connection.close();
     });
 
     test("should create museumItem", async () => {
-
         const newMuseum = {
             firstPageImage: "https://museums-welsh-heritage-bucket.s3.eu-north-1.amazonaws.com/museum-content/image-1775070689146-Screenshot 2026-04-01 at 20.11.18.png",
             museumTitle: "The Grand Gallery of Art",
@@ -62,7 +57,6 @@ describe("museum Creation wiht DB", () => {
                 }
             ]
         };
-
         const res = await request(app)
             .post("/api/createMuseum")
             .send(newMuseum)

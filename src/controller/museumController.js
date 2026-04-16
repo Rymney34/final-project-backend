@@ -41,7 +41,6 @@ export const putObject = async (file, fileName) => {
     }
 };
 
-
 // actual controller an important function for uploaing images to AWS
 export const setMuseumPic = async (req, res) => {
     try {
@@ -61,7 +60,6 @@ export const setMuseumPic = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
-
 
 // actual controller an important function for uploaing videos to AWS
 export const setMuseumVideo = async (req, res) => {
@@ -124,14 +122,12 @@ export const createMuseum = async (req, res) => {
             await addMuseum.save(); // throws an error if document was update by another process
             return addMuseum;
         });
-
         // returning success and 201
         res.status(201).json({
             success: true,
             data: newMuseum,
             message: "Good job, Museum is submitted/added"
         });
-
         // catching error special and unique code to check if this booking already exists 
     } catch (error) {
         if (error.code === 11000) {

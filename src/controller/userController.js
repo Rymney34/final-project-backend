@@ -75,7 +75,7 @@ import { summariseHistory } from "../services/aiService.js";
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
 
-            console.log(refreshToken)
+            // console.log(refreshToken)
             //put data into cookies 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -112,8 +112,6 @@ import { summariseHistory } from "../services/aiService.js";
             if (!user) {
                 return res.status(400).json({ error: 'no user' });
             }
-
-            
             res.json(user);
         } catch (err) {
             console.error("geting user error:", err);
@@ -127,9 +125,6 @@ import { summariseHistory } from "../services/aiService.js";
             console.log("body ", req.body)
 
             const { userId, history } = req.body;
-            // const {history } = req.body;
-            console.log(userId, "userID")
-            console.log(history, "user history")
 
             if (!history) {
                 return res.status(400).json({ error: "Missing required fields" });
@@ -141,7 +136,7 @@ import { summariseHistory } from "../services/aiService.js";
             //then get it from array and join each node together in one single line
             const userOnlyHistory = userOnlyHistoryArray.join(" ")
 
-            console.log(userOnlyHistory, "user only  history")
+            // console.log(userOnlyHistory, "user only  history")
 
             //calling function for summarizing 
             const summary = await summariseHistory(userOnlyHistory);

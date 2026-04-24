@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import connect from "../config/dbConnect.js";
-
 // model for museum
 const museumScheme = new mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },

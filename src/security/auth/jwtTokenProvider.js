@@ -3,7 +3,7 @@ import express from 'express';
 
 
     
-    const JWT_Token = process.env.ACCESS_TOKEN_SECRET || "super_secret_test_key_123";
+    const JWT_Token = process.env.ACCESS_TOKEN_SECRET;
     const ACCESS_Token_Expires = '10min';
     const REFRESH_Token = process.env.REFRESH_TOKEN;
     const REFRESH_Token_Expires = "1d"

@@ -25,7 +25,7 @@ export const putObject = async (file, fileName) => {
             Body: file.buffer,
             ContentType: "image/jpg,jpeg,png",
         };
-        console.log(params.Key)
+    
 
         const command = new PutObjectCommand(params)
         const data = await s3.send(command); 
@@ -34,7 +34,7 @@ export const putObject = async (file, fileName) => {
             return;
         }
         let url = `https://museums-welsh-heritage-bucket.s3.${process.env.S3_BUCKET_REGION}.amazonaws.com/${params.Key}`;
-        console.log(url);
+   
         return { url, key: params.Key };
     } catch (err) {
         console.error(err);
@@ -60,7 +60,6 @@ export const setMuseumPic = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
-
 // actual controller an important function for uploaing videos to AWS
 export const setMuseumVideo = async (req, res) => {
     try {
@@ -100,7 +99,6 @@ export const createMuseum = async (req, res) => {
         } = req.body;
         // check that all not null or undefined that there is value
         if (!museumTitle || !firstPageImage) { return res.status(400).json({ message: "Missing required fields" }); }
-
         // lock booking or allows to have queue of adding museums on the user side 
         const newMuseum= await lock.acquire(lockKey, async () => {
             // creating actual Museum
@@ -137,7 +135,6 @@ export const createMuseum = async (req, res) => {
                 message: "Unfortunately musuem alredy exist"
             });
         }
-       
         console.error("Error :", error);
         res.status(500).json({
             success: false,
@@ -149,7 +146,6 @@ export const createMuseum = async (req, res) => {
 }
 
 export const getMuseum = async (req, res) => {
-
     try {
         //limit in amount of museum added to reduce load time and load on the server and db
         const page = parseInt(req.query.page) || 1;
@@ -191,7 +187,6 @@ export const getMuseum = async (req, res) => {
         throw error
     }
 }
-
 export const getEachMuseum = async (req, res) => {
     try {
         // getting id from frontend 
@@ -200,14 +195,11 @@ export const getEachMuseum = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid Museum ID" })
         }
-        //find musumse by ID
+        //find museum by ID
         const result = await museum.findById(id);
-
-
         if (!result) {
             return res.status(404).json({ message: "Museum Not found" })
         }
-
         return res.status(200).json(result)
     }
     catch (error) {

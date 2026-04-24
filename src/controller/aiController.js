@@ -1,5 +1,7 @@
 import geminiService from '../services/aiService.js';
 
+
+//genereating response and geting response from frontend 
 export const generateResponse = async (req, res) => {
     try {
         const {prompt} = req.body
@@ -27,7 +29,7 @@ export const generateResponse = async (req, res) => {
         })
     }
 }
-
+//genereating chat getting data such as prompt or file, history from frontend and persona history from database
 export const generateChat= async (req, res,next) => {
     try {
         const { prompt, files, history } = req.body

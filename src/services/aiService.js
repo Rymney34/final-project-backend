@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from "@google/genai";
 import fs from 'fs';
 import path from 'path';
+import { welshResources } from './welshResources.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,13 +26,10 @@ function readFile(filePath) {
 //Declaring var with file fucntion that is readaing and returning string with all instructions 
 const adventOfCodeInput = readFile(path.join(__dirname, 'inst.txt'));
 
-// console.log(adventOfCodeInput)
-
 //calling Gemini AI API and passing props from client 
 export const generateResponseAi = async (userPrompt, files=[]) => {
     // The client gets the API key from the environment variable `GEMINI_API_KEY`.
     // const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
-    console.log('Insight');
     try{
         const parts = [];
 
@@ -123,7 +121,6 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
         topP: 1,
         maxOutputTokens: 300,
     };
-
     const parts = [];
     //just text no file
     if (userPrompt) {
@@ -138,7 +135,6 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
             }
         })
     }
-
     try {
         //calling AI model with intruction from txt file and passing dynamic history from db
         const chat = await ai.chats.create({
@@ -147,11 +143,12 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
             config: {
                 systemInstruction: `use this information, keep it mind or reference 
                 where applicable to response to each prompt  ${adventOfCodeInput}
+                dataset with Welsh resources ${welshResources}
                 GENERAL INFO ABOUT THIS USER - User Profile ${chatSummary || "Nothing"}
+                
                 `,
             },
             history : incHistory
-
         });
         //sending mesage with all instrucitons etc
         const result = await chat.sendMessage({message: parts});

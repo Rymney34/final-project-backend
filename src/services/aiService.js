@@ -28,15 +28,12 @@ const adventOfCodeInput = readFile(path.join(__dirname, 'inst.txt'));
 
 //calling Gemini AI API and passing props from client 
 export const generateResponseAi = async (userPrompt, files=[]) => {
-    // The client gets the API key from the environment variable `GEMINI_API_KEY`.
-    // const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
     try{
         const parts = [];
 
         if(userPrompt){
             parts.push({text: userPrompt});
         }
-
         for (const file of files){
             parts.push({
                 inlineData: {
@@ -45,8 +42,6 @@ export const generateResponseAi = async (userPrompt, files=[]) => {
                 }
             })
         }
-
-        console.log("this is parts", parts)
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-lite",
             contents:[
@@ -63,8 +58,6 @@ export const generateResponseAi = async (userPrompt, files=[]) => {
             },
             
         });
-       
-        console.log(response.text);
         return response.text
     }
     catch(error){

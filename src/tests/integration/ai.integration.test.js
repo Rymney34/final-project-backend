@@ -50,7 +50,7 @@ describe("AI test", () => {
     test("should generate text with history Chat", async () => {
 
         const chatPromptToAI = {
-            prompt: "do I like fossils?",
+            prompt: "what color is museum ?",
             files: [],
             history: [
                 { role: "user", parts: [{ text: "Hi, museum red!"}]},

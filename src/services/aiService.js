@@ -129,6 +129,7 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
         })
     }
     try {
+        
         //calling AI model with intruction from txt file and passing dynamic history from db
         const chat = await ai.chats.create({
             generationConfig,
@@ -143,6 +144,7 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
             },
             history : incHistory
         });
+        
         //sending mesage with all instrucitons etc
         const result = await chat.sendMessage({message: parts});
         // returning AI response
@@ -150,6 +152,9 @@ const generateChat = async (userPrompt, files = [], incHistory = [], chatSummary
     }
     catch (error) {
         console.error("Gemini Service Error:", error);
+        if (error.statusCode === 503 || error.message === "AI_SERVICE_BUSY") {
+            throw error;
+        }
         throw new Error("Failed to communicate with AI");
     }
 }

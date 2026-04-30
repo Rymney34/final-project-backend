@@ -54,6 +54,12 @@ export const generateChat= async (req, res,next) => {
     }
     catch (error) {
         console.error("Error in Aicontoller:", error.message);
+        if (error.statusCode === 503 || error.status === 503 || error.message?.includes("503") || error.message === "AI_SERVICE_BUSY") {
+            return res.status(503).json({
+                success: false,
+                message: "The AI is currently busy. Please send your message again."
+            });
+        }
 
         return res.status(500).json({
             success: false,

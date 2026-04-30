@@ -14,6 +14,8 @@ import cookieParser from 'cookie-parser';
 const PORT = process.env.PORT || 3001
 const app = express();
 
+app.get('/health', (req, res) => res.status(200).send('OK'));
+
 (async () => {
     try{
         await db(process.env.ATLAS_URI);
@@ -22,15 +24,19 @@ const app = express();
     }
 })();
 
+
+
 app.use(express.json({limit: "10mb"}))
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 //calling cors
 app.use(cors({
-    origin: 'http://localhost:3000', //'http://localhost:4173'
+    origin: process.env.CLIENT_URL, //'http://localhost:4173'
     credentials: true
 }));
 //calling cookies func
 app.use(cookieParser());
+
+
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "Backend OK " });
